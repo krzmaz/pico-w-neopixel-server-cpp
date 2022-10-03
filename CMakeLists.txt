@@ -1,10 +1,5 @@
 cmake_minimum_required(VERSION 3.19)
 
-find_package(Perl)
-if(NOT PERL_FOUND)
-    message(FATAL_ERROR "Perl is needed for generating the fsdata.c file")
-endif()
-
 set(PICO_BOARD pico_w)
 include(cmake/utils.cmake)
 
@@ -26,7 +21,7 @@ else()
     set(WIFI_PASSWORD "password" CACHE INTERNAL "WiFi password for examples")
 endif()
 
-project(pico_w_webserver C CXX ASM)
+project(pico_w_neopixel_server C CXX ASM)
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
