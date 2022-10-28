@@ -1,6 +1,10 @@
+#include <cstddef>
+#include <cstdint>
 #include <cstdlib>
 #include <string.h>
 #include <stdlib.h>
+
+#include <vector>
 
 #include "lwip/apps/httpd.h"
 #include "pico/stdlib.h"
@@ -14,7 +18,8 @@
 #define IS_RGBW false
 #define NUM_PIXELS 8
 
-#define DATA_BUFSIZE 2048
+#define DATA_BUFSIZE 1500
+std::vector<char> pixel_data_buffer;
 
 static inline void put_pixel(uint32_t pixel_grb) {
     pio_sm_put_blocking(pio0, 0, pixel_grb << 8u);
@@ -41,6 +46,8 @@ httpd_post_begin(void *connection, const char *uri, const char *http_request,
   LWIP_UNUSED_ARG(http_request);
   LWIP_UNUSED_ARG(http_request_len);
   if (!memcmp(uri, "/pixels", 8)) {
+    pixel_data_buffer.clear();
+    pixel_data_buffer.reserve(2000);
     // change this to 0 and handle in httpd_post_data_recved if we will be too slow
     *post_auto_wnd = 1;
     return ERR_OK;
@@ -51,35 +58,16 @@ httpd_post_begin(void *connection, const char *uri, const char *http_request,
 err_t
 httpd_post_receive_data(void *connection, struct pbuf *p)
 {
-  err_t ret;
+  err_t ret = ERR_OK;
 
   LWIP_ASSERT("NULL pbuf", p != NULL);
 
-  if (true) {
-    u16_t token_data = pbuf_memfind(p, "data=", 5, 0);
-    if ((token_data != 0xFFFF)) {
-      u16_t value_data = token_data + 5;
-      u16_t len_data = 0;
-      /* find data len */
-      len_data = p->tot_len - value_data;
-      // TODO: modulo 3 the len (each pixel needs 3 bytes)
-      if ((len_data > 0) && (len_data < DATA_BUFSIZE)) {
-        /* provide contiguous storage if p is a chained pbuf */
-        char buf_data[DATA_BUFSIZE];
-        char *data = (char *)pbuf_get_contiguous(p, buf_data, sizeof(buf_data), len_data, value_data);
-        if (data) {
-          data[len_data] = 0;
-          for (int i=0; i<len_data; i+=3) {
-            put_pixel(urgb_u32(data[i], data[i+1], data[i+2]));
-          }
-        }
-      }
+  char buf_data[DATA_BUFSIZE];
+  char *data = (char *)pbuf_get_contiguous(p, buf_data, sizeof(buf_data), p->tot_len, 0);
+  if (data) {
+    for (int i = 0; i < p->tot_len; ++i) {
+      pixel_data_buffer.push_back(data[i]);
     }
-    /* not returning ERR_OK aborts the connection, so return ERR_OK unless the
-       connection is unknown */
-    ret = ERR_OK;
-  } else {
-    ret = ERR_VAL;
   }
 
   /* this function must ALWAYS free the pbuf it is passed or it will leak memory */
@@ -91,6 +79,11 @@ httpd_post_receive_data(void *connection, struct pbuf *p)
 void
 httpd_post_finished(void *connection, char *response_uri, u16_t response_uri_len)
 {
+  if (pixel_data_buffer.size() % 3 == 0 ) {
+    for (size_t i=0; i<pixel_data_buffer.size(); i+=3) {
+      put_pixel(urgb_u32(pixel_data_buffer[i], pixel_data_buffer[i+1], pixel_data_buffer[i+2]));
+    }
+  }
   snprintf(response_uri, response_uri_len, "/res.json");
 }
 
