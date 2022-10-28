@@ -57,4 +57,5 @@
 
 #define LWIP_HTTPD 1
 #define LWIP_HTTPD_SUPPORT_POST 1
+#define LWIP_HTTPD_SUPPORT_11_KEEPALIVE 1
 #define HTTPD_FSDATA_FILE "my_fsdata.c"
