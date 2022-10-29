@@ -55,6 +55,8 @@
 #define LWIP_STATS_DISPLAY          1
 #endif
 
+#define TCP_KEEPIDLE 10
+#define TCP_KEEPINTVL 10
 #define LWIP_HTTPD 1
 #define LWIP_HTTPD_SUPPORT_POST 1
 #define LWIP_HTTPD_SUPPORT_11_KEEPALIVE 1
