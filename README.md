@@ -23,5 +23,12 @@ Then to send it to the device:
 ```bash
 curl --data-binary @tmp.txt <IP_ADDRESS>/pixels
 ```
+
+## FS data
+The `my_fsdata.c` file containing the response `res.json` file needs to be generated using [makefsdata](https://github.com/lwip-tcpip/lwip/tree/master/src/apps/http/makefsdata) executable compiled for the host machine.  
+Create a folder named `fs` and a `res.json` file with the content of `{}` in it, and run `makefsdata -11 -nossi` in the directory that contains the `fs` directory.
+
+There are issues in the template repository for automating this using Perl/Python scripts, however those lack some functionality that the C program has, and we need, like the `keep-alive` header. 
+
 -----
 Generated using https://github.com/krzmaz/pico-w-webserver-example
