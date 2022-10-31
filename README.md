@@ -6,6 +6,7 @@ Developed to work with https://github.com/mrozycki/rustmas project.
 ---
 ## Dependencies:
 - CMake 3.19+
+- C++ toolchain for host architecture to build the makefsdata utility
 - ARM GNU toolchain
 
 If you don't have them set up, you can use [these instructions](https://datasheets.raspberrypi.com/pico/getting-started-with-pico.pdf#%5B%7B%22num%22%3A39%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D)
@@ -25,8 +26,10 @@ curl --data-binary @tmp.txt <IP_ADDRESS>/pixels
 ```
 
 ## FS data
-The `my_fsdata.c` file containing the response `res.json` file needs to be generated using [makefsdata](https://github.com/lwip-tcpip/lwip/tree/master/src/apps/http/makefsdata) executable compiled for the host machine.  
-Create a folder named `fs` and a `res.json` file with the content of `{}` in it, and run `makefsdata -11 -nossi` in the directory that contains the `fs` directory.
+The `my_fsdata.c` file containing the response `res.json` file is generated using [makefsdata](https://github.com/lwip-tcpip/lwip/tree/master/src/apps/http/makefsdata) executable compiled for the host machine.  
+It works on Mac in my testing, but the file only has `#ifdef` clauses for `__linux__` and `WIN32`,
+so we trick it into compiling by defining `__linux__` on Mac, which is generally a bad idea, but it was
+quicker to implement than creating patching logic.
 
 There are issues in the template repository for automating this using Perl/Python scripts, however those lack some functionality that the C program has, and we need, like the `keep-alive` header. 
 
