@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "lwip/apps/httpd.h"
+#include "lwip/apps/mdns.h"
 #include "pico/stdlib.h"
 #include "pico/cyw43_arch.h"
 
@@ -121,6 +122,10 @@ int main() {
         auto ip_addr = cyw43_state.netif[CYW43_ITF_STA].ip_addr.addr;
         printf("IP Address: %lu.%lu.%lu.%lu\n", ip_addr & 0xFF, (ip_addr >> 8) & 0xFF, (ip_addr >> 16) & 0xFF, ip_addr >> 24);
     }
+
+    const auto hostname =  "pico-w-neopixel-server";
+    mdns_resp_init();
+    mdns_resp_add_netif(&cyw43_state.netif[CYW43_ITF_STA], hostname);
 
     PIO pio = pio0;
     int sm = 0;
