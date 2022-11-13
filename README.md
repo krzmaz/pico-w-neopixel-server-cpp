@@ -3,6 +3,14 @@ Simple webserver aiming to be a thin remote controller for neopixel strips.
 
 Developed to work with https://github.com/mrozycki/rustmas project.
 
+
+If your host is capable of using mDNS, then you should be able to connect to the pico board using following hostname:
+```
+pico-w-neopixel-server.local
+```
+**WARNING:** There is no implemented conflict resolution - if you plan to use more than one neopixel server, 
+consider changing the hostnames to different values for each server.
+
 ---
 ## Dependencies:
 - CMake 3.19+
@@ -21,7 +29,7 @@ temp=0; while [ $temp -lt $NUM_PIXELS ]; do byte=$(expr $temp % 100); printf "\x
 ```
 Then to send it to the device:
 ```bash
-curl --data-binary @tmp.txt <IP_ADDRESS>/pixels
+curl --data-binary @tmp.txt pico-w-neopixel-server.local/pixels
 ```
 
 ## FS data
