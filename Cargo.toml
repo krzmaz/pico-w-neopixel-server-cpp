@@ -57,4 +57,4 @@ rand = { version = "0.8.5", default-features = false }
 itertools = { version = "0.11.0", default-features = false }
 
 [profile.release]
-debug = 2
+# debug = 2

@@ -198,10 +198,10 @@ async fn main(spawner: Spawner) {
     control.gpio_set(0, false).await;
     // And now we can use it!
 
-    let mut rx_buffer = [0; 4096];
-    let mut tx_buffer = [0; 4096];
+    let mut rx_buffer = [0; 16384];
+    let mut tx_buffer = [0; 1024];
     let mut read_buf = [0; 4096];
-    let mut buffer = Vec::<u8, 4096>::new();
+    let mut buffer = Vec::<u8, 16384>::new();
     loop {
         let mut socket = TcpSocket::new(stack, &mut rx_buffer, &mut tx_buffer);
         socket.set_timeout(Some(Duration::from_secs(10)));
@@ -210,7 +210,7 @@ async fn main(spawner: Spawner) {
         log::info!("Listening on TCP:1234...");
         if let Err(e) = socket.accept(1234).await {
             log::warn!("accept error: {:?}", e);
-            // continue;
+            continue;
         }
 
         // info!("Received connection from {:?}", socket.remote_endpoint());
@@ -246,8 +246,11 @@ async fn main(spawner: Spawner) {
                         .map(|(r, g, b)| ((u32::from(g) << 24) | (u32::from(r) << 16) | (u32::from(b) << 8)))
                         .collect();
                     ws2812.write_raw(&rgb_words).await;
+                    // let the neopixels latch on
+                    Timer::after_micros(51).await;
+
                     buffer.clear();
-                    if let Some(remainder) = read_buf.get((count - overflow)..overflow) {
+                    if let Some(remainder) = read_buf.get((count - overflow)..count) {
                         // safe to unwrap since we clear the buffer above, so the remainder
                         // cannot extend its capacity
                         buffer.extend_from_slice(remainder).unwrap();
@@ -327,9 +330,6 @@ async fn main(spawner: Spawner) {
             // ws2812.write(&data).await;
             // if we want to echo what we got:
             // socket.send_to(&buf[..n], ep).await.unwrap();
-
-            // give away control for 1ms to hopefully give more resources to the network stack...
-            Timer::after_millis(1).await;
         }
     }
 }
