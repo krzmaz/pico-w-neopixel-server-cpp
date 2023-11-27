@@ -1,6 +1,11 @@
 [target.'cfg(all(target_arch = "arm", target_os = "none"))']
-# runner = "picotool load -f -t elf"
-runner = "elf2uf2-rs -d"
+runner = "picotool load -uvx -t elf"
+# elf2uf2-rs is very slow to upload the code after a recent MacOS update on my machine
+# for comletely Rust-only experience do
+# cargo install elf2uf2-re
+# and uncomment this:
+# runner = "elf2uf2-rs -d"
+
 
 
 [build]
