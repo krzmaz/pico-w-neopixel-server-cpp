@@ -1,14 +1,14 @@
 use core::panic::PanicInfo;
-// A shorter alias for the Peripheral Access Crate, which provides low-level
-// register access
-use rp_pico::hal::pac;
 
-/// Reset at panic, see https://github.com/rp-rs/rp-hal/issues/564
+#[inline(never)]
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
+    // TODO: It seems like this only runs after the executor runs another task
+    // it's something, but immediate reset on panic would be better ¯\_(ツ)_/¯
     unsafe {
-        (*pac::PSM::PTR).wdsel.write(|w| w.bits(0x0000ffff));
-        (*pac::WATCHDOG::PTR).ctrl.write(|w| w.trigger().set_bit());
+        let p = embassy_rp::Peripherals::steal();
+        let mut w = embassy_rp::watchdog::Watchdog::new(p.WATCHDOG);
+        w.trigger_reset();
         core::hint::unreachable_unchecked();
     }
 }

@@ -9,11 +9,12 @@
 #![allow(incomplete_features)]
 
 mod binary_info;
+mod panic;
 mod secret;
-// mod panic;
 
 use cyw43_pio::PioSpi;
 use defmt::*;
+use defmt_rtt as _;
 use embassy_executor::Spawner;
 use embassy_net::tcp::TcpSocket;
 use embassy_net::{Stack, StackResources};
@@ -28,9 +29,7 @@ use fixed::types::U24F8;
 use fixed_macro::fixed;
 use heapless::Vec;
 use itertools::Itertools;
-// Import useful traits to handle the ws2812 LEDs:
 use static_cell::make_static;
-use {defmt_rtt as _, panic_probe as _};
 
 bind_interrupts!(struct Irqs {
     USBCTRL_IRQ => embassy_rp::usb::InterruptHandler<USB>;
