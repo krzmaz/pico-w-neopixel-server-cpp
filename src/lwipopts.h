@@ -59,6 +59,9 @@
 #define LWIP_MDNS_RESPONDER 1
 #define LWIP_NUM_NETIF_CLIENT_DATA (LWIP_MDNS_RESPONDER)
 
+// from https://github.com/raspberrypi/pico-sdk/issues/1281#issuecomment-1615938045
+#define MEMP_NUM_SYS_TIMEOUT            (LWIP_NUM_SYS_TIMEOUT_INTERNAL+3)
+
 #define TCP_KEEPIDLE 10
 #define TCP_KEEPINTVL 10
 #define LWIP_HTTPD 1

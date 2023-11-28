@@ -22,7 +22,6 @@ target_include_directories(${PROGRAM_NAME} PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
         )
 target_link_libraries(${PROGRAM_NAME}
-        cyw43_driver_base
         pico_cyw43_arch_lwip_threadsafe_background
         pico_lwip_http
         pico_lwip_mdns
